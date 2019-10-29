@@ -59,21 +59,42 @@ MongoClient.connect(url, {useNewUrlParser: true, useUnifiedTopology: true}, (err
     app.post('/auth', (req,res) => {
         try {
             const userToAuth = req.body;
-            const user = db.collection('user').findOne( {
+            db.collection('user').findOne( {
                     email: `${userToAuth.email}`,
                     password: `${userToAuth.password}`
                 }, (err, result) => {
-                    if (err) throw err;
-                    console.log(result);     
+                    if (err) 
+                        throw new Error;
+                    if (!result) {
+                         return res.redirect('/register');//TODO
+                    }
+          
+                    res.render('./tasks');  
             });
-
-            res.render('./tasks');
-        
+    
         } catch (e) {
                 res.status(400).json(e.message);
             }
     })
-})
 
-app.listen(port, () => console.log(`Listening on port ${port}`))
+    app.get('/tasks', async (req,res) => {
+        const tasks = await db.collection('task').find({});
+        const tasksArray = await tasks.toArray();
+        res.render('./tasks', {tasksArray: tasksArray});
+    })    
 
+    app.post('/tasks/add', (req,res) => {
+        const task = req.body;
+        db.collection('task').insertOne(task);
+        res.redirect('/tasks');
+    })
+
+    app.get('/tasks/del', async (req,res) => {
+        const taskToDel = req.body;
+        await db.collection('task').deleteOne();
+        res.redirect('/tasks');
+    })
+
+});
+
+app.listen(port, () => console.log(`Listening on port ${port}`));
