@@ -7,24 +7,51 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css?family=Indie+Flower&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <title>Test task</title>
 </head>
 <body>
     <div class="container d-flex p-3"> 
         <h1>Task list</h1>
-        <div>
          <ul>
             {{#each this.tasksArray as |task|}}
-                <li>{{task.title}}! <a href="/tasks/del"><i class="fa fa-trash"></i></a></li>
+                <form id="editForm" action="/tasks/edit" method="POST">
+                    <input type="text" id={{task._id}} value={{task.title}}>
+                </form> 
+                <li>{{task.title}}!
+                    <a id={{task._id}} class="btnEdit"><i class="fa fa-edit"></i></a> 
+                    <a href= '' id={{task._id}} onclick="deleteTask(id)"><i class="fa fa-trash"></i></a>
+                </li>
             {{/each}}
          </ul>
-        </div>
         <div>
             <form action="/tasks/add" method="POST">
-                Enter your task <input type="text" name="title">
+                Enter your task <input id="taskInpt" type="text" name="title">
                 <input class="btn subBtn" type="submit" value="Submit">
             </form>
         </div>
     </div>
+
+    <script>
+    
+        function deleteTask(id) {
+            $.post(`/tasks/delete?id=${id}`);
+        }
+
+           let [lishka] = document.getElementsByTagName("li");
+           let eForm = document.getElementById("editForm");
+           let [btnEdit] = document.getElementsByClassName("btnEdit");
+           
+           btnEdit.onclick = () => {
+                lishka.style.display = ("none");
+                eForm.style.display = ("inline");
+
+           }
+        
+        function editTask(id) {
+            $.post(`/tasks/edit?id=${id}`);
+            
+        }
+    </script>
 </body>
 </html>

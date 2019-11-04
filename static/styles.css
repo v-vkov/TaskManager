@@ -75,3 +75,7 @@ h1 {
     background-color: ivory;
 
 }
+
+#editForm {
+    display: none;
+}
